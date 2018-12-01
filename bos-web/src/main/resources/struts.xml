@@ -4,11 +4,43 @@
         "http://struts.apache.org/dtds/struts-2.3.dtd">
 
 <struts>
+
     <constant name="struts.devMode" value="false"/>
     <package name="basic=struts2" extends="struts-default">
+        <interceptors>
+            <interceptor name="bosLoginInterceptor" class="com.cc.bos.web.interceptor.BOSLoginInterceptor">
+                <!--指定不需要拦截的方法-->
+                <param name="excludeMethods">login</param>
+            </interceptor>
+            <!--定义拦截器栈-->
+            <interceptor-stack name="myStack">
+                <interceptor-ref name="bosLoginInterceptor"></interceptor-ref>
+                <interceptor-ref name="defaultStack"></interceptor-ref>
+            </interceptor-stack>
+        </interceptors>
+        <!--配置默认拦截器栈-->
+        <default-interceptor-ref name="myStack"/>
+
+        <!--全局结果集-->
+        <global-results>
+            <result name="login">/login.jsp</result>
+        </global-results>
+
+
         <!--需要进行权限控制的页面-->
         <action name="page_*_*">
             <result type="dispatcher">/WEB-INF/pages/{1}/{2}.jsp</result>
+        </action>
+
+        <!--用户管理-->
+        <action name="user_*" class="userAction" method="{1}">
+            <result name="login">/login.jsp</result>
+            <result name="home" type="redirect">/index.jsp</result>
+        </action>
+
+        <!--员工管理-->
+        <action name="staff_*" class="staffAction" method="{1}">
+            <result name="list">/page_base_staff</result>
         </action>
     </package>
 </struts>
